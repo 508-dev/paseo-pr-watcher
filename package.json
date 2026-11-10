@@ -1,0 +1,33 @@
+{
+  "name": "@508-dev/paseo-pr-watcher",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Opt-in GitHub pull request watcher for Paseo agents",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/508-dev/paseo-pr-watcher.git"
+  },
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts --bail=1",
+    "lint": "oxlint --config .oxlintrc.json .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
+  },
+  "devDependencies": {
+    "@getpaseo/client": "0.16.0-beta.1",
+    "@getpaseo/plugin": "0.16.0-beta.1",
+    "@getpaseo/protocol": "0.16.0-beta.1",
+    "@types/node": "^22.0.0",
+    "@types/react": "~19.2.0",
+    "oxfmt": "0.74.0",
+    "oxlint": "1.61.0",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.6",
+    "zod": "^4.4.3"
+  }
+}

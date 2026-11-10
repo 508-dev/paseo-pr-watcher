@@ -1,0 +1,6 @@
+{
+  "id": "pr-watcher",
+  "name": "PR watcher",
+  "description": "Watch GitHub pull requests and wake their Paseo agents when checks or reviews change",
+  "requirements": { "paseo": ">=0.16.0-beta.1 <0.17.0" }
+}
