@@ -6,7 +6,7 @@ An opt-in [Paseo](https://paseo.sh) plugin that watches a GitHub PR and sends it
 
 1. Run Paseo 0.16.0 beta 1 or newer within the 0.16 series on the daemon and app.
 2. Install and authenticate `gh` on the daemon machine. The authenticated account needs read access to the PRs you watch.
-3. Install this repository with `paseo plugin install github:508-dev/paseo-pr-watcher` after the feature branch is merged. During review, install with `--ref feat/pr-watcher` on an isolated test daemon.
+3. During review, install with `paseo plugin install git:508-dev/paseo-pr-watcher --ref feat/pr-watcher`. After PR #1 merges, omit `--ref` to use the default branch. The daemon needs Node and npm on its command path; the manifest installs the locked SDK and validation dependencies with lifecycle scripts disabled.
 4. In an agent chat, send `/watch-pr https://github.com/owner/repo/pull/123` or `/watch-pr owner/repo#123`.
 5. Open **Watched pull requests** in Command Center to view or remove watches.
 
@@ -23,7 +23,7 @@ The plugin's background poller gets its Paseo SDK session when an app connects o
 ## Development
 
 ```sh
-npm ci --ignore-scripts
+npm ci --include=dev --legacy-peer-deps --ignore-scripts
 npm run typecheck
 npm run lint
 npm run format:check
