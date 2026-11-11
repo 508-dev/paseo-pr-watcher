@@ -5,7 +5,13 @@ export interface WatchEvent {
   line: string;
 }
 
-const failedConclusions = new Set(["FAILURE", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE"]);
+const failedConclusions = new Set([
+  "FAILURE",
+  "ERROR",
+  "TIMED_OUT",
+  "ACTION_REQUIRED",
+  "STARTUP_FAILURE",
+]);
 const reviewStates = new Set(["CHANGES_REQUESTED", "COMMENTED", "APPROVED"]);
 
 export function actionableEvents(snapshot: PullRequestSnapshot): WatchEvent[] {

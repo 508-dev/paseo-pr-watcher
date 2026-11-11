@@ -52,7 +52,15 @@ export async function readPullRequest(ref: PullRequestRef): Promise<PullRequestS
   try {
     ({ stdout } = await execFileAsync(
       "gh",
-      ["pr", "view", String(ref.number), "--repo", ref.repository, "--json", fields],
+      [
+        "pr",
+        "view",
+        String(ref.number),
+        "--repo",
+        `github.com/${ref.repository}`,
+        "--json",
+        fields,
+      ],
       { timeout: 30_000, maxBuffer: 4 * 1024 * 1024 },
     ));
   } catch {

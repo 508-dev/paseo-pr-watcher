@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Opt-in GitHub pull request watcher for Paseo agents",
-  "license": "Apache-2.0",
+  "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "https://github.com/508-dev/paseo-pr-watcher.git"

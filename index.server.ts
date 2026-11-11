@@ -6,6 +6,10 @@ import { addWatch, listWatches, removeWatch, resolveUncertain } from "./shared/c
 export default function contribute(server: PluginServerContext) {
   const watcher = new Watcher(new WatchStore());
   const ready = watcher.start();
+  // Observe startup immediately; RPC handlers still await the original rejection.
+  void ready.catch(() =>
+    console.error("PR watcher could not load its state file. Restore it and reload the plugin."),
+  );
 
   server.handle(addWatch, async ({ agentId, pullRequest }, { paseo }) => {
     await ready;

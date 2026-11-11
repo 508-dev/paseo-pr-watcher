@@ -18,6 +18,7 @@ export class Watcher {
   private paseo: PaseoApi | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private polling = false;
+  private stopped = false;
   private queue: Promise<unknown> = Promise.resolve();
 
   constructor(
@@ -30,10 +31,12 @@ export class Watcher {
 
   async start(): Promise<void> {
     await this.store.load();
+    if (this.stopped) return;
     this.timer = setInterval(() => void this.poll().catch(() => undefined), pollIntervalMs);
   }
 
   stop(): void {
+    this.stopped = true;
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
     this.paseo = null;
@@ -152,6 +155,10 @@ export class Watcher {
       watch.status = "closed";
       await this.store.save();
       return;
+    }
+    // A clean poll ends this conflict episode, even if the PR head has not changed.
+    if (["CLEAN", "BEHIND", "HAS_HOOKS", "UNSTABLE"].includes(snapshot.mergeStateStatus)) {
+      watch.seenIds = watch.seenIds.filter((id) => !id.startsWith("conflict:"));
     }
     const seen = new Set(watch.seenIds);
     const events = actionableEvents(snapshot).filter((event) => !seen.has(event.id));

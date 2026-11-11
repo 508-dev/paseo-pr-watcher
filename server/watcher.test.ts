@@ -63,6 +63,30 @@ describe("GitHub watch events", () => {
   });
 });
 
+describe("watcher lifecycle", () => {
+  it("does not leave a polling timer when stopped during state loading", async () => {
+    let completeLoad!: () => void;
+    const store = new WatchStore();
+    vi.spyOn(store, "load").mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          completeLoad = resolve;
+        }),
+    );
+    vi.useFakeTimers();
+    try {
+      const watcher = new Watcher(store);
+      const ready = watcher.start();
+      watcher.stop();
+      completeLoad();
+      await ready;
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("watcher delivery", () => {
   let directory: string;
   let file: string;
@@ -116,6 +140,36 @@ describe("watcher delivery", () => {
       "check:abc123:new:t1",
     );
     watcher.stop();
+  });
+
+  it("reports legacy CI errors", () => {
+    expect(
+      actionableEvents({
+        ...base,
+        checks: [{ name: "external-ci", conclusion: "ERROR", completedAt: null, detailsUrl: null }],
+      }),
+    ).toEqual([{ id: "check:abc123:external-ci:ERROR", line: "Check external-ci error." }]);
+  });
+
+  it("reports a new conflict after a clean poll on the same head", async () => {
+    let snapshot = { ...base, mergeStateStatus: "DIRTY" };
+    const send = vi.fn(async () => undefined);
+    const watcher = new Watcher(new WatchStore(file), async () => snapshot);
+    await watcher.start();
+    watcher.attachPaseo({ agents: { ref: () => ({ send }) } } as unknown as PaseoApi);
+    try {
+      await watcher.add("agent-1", "owner/repo#12");
+      await watcher.poll();
+      expect(send).not.toHaveBeenCalled();
+      snapshot = { ...base, mergeStateStatus: "CLEAN" };
+      await watcher.poll();
+      snapshot = { ...base, mergeStateStatus: "DIRTY" };
+      await watcher.poll();
+      expect(send).toHaveBeenCalledTimes(1);
+      expect(send.mock.calls[0]).toEqual([expect.stringContaining("merge conflict")]);
+    } finally {
+      watcher.stop();
+    }
   });
 
   it("does not resend after an ambiguous failure or a restart", async () => {
