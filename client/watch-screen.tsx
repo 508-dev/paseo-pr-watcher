@@ -8,6 +8,7 @@ import {
   type watchSchema,
 } from "../shared/contracts.js";
 import type { z } from "zod";
+import { watchChanged } from "./watch-events.js";
 
 type Watch = z.infer<typeof watchSchema>;
 
@@ -42,6 +43,7 @@ export function WatchScreen({ theme, layout }: PluginScreenProps) {
     setBusy(id);
     try {
       await action();
+      watchChanged();
       await refresh();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Action failed.");
@@ -64,8 +66,8 @@ export function WatchScreen({ theme, layout }: PluginScreenProps) {
         Watched pull requests
       </Text>
       <Text style={{ color: muted }}>
-        Use /watch-pr with a GitHub PR URL in an agent chat. New failed checks, reviews, and merge
-        conflicts send that agent a follow-up.
+        Use Watch PR in a workspace header or agent tab to detect its pull request and choose who
+        receives follow-ups. You can also use /watch-pr with a GitHub PR URL in an agent chat.
       </Text>
       {loading ? <Text style={{ color: muted }}>Loading…</Text> : null}
       {error ? <Text style={{ color: foreground }}>{error}</Text> : null}

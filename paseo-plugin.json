@@ -15,5 +15,9 @@
       "--no-audit",
       "--no-fund"
     ]
+  ],
+  "media": [
+    "docs/screenshots/workspace-watch-desktop.png",
+    "docs/screenshots/workspace-watch-compact.png"
   ]
 }
