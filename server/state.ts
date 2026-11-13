@@ -13,6 +13,7 @@ const pendingSchema = z.object({
 export const recordSchema = z.object({
   id: z.string(),
   agentId: z.string(),
+  workspaceId: z.string().optional(),
   repository: z.string(),
   number: z.number().int().positive(),
   url: z.string(),

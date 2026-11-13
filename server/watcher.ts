@@ -50,7 +50,7 @@ export class Watcher {
     return this.store.list();
   }
 
-  add(agentId: string, input: string): Promise<WatchRecord> {
+  add(agentId: string, input: string, context?: { workspaceId: string }): Promise<WatchRecord> {
     return this.serial(async () => {
       if (this.store.list().length >= maxWatches)
         throw new Error(`Watch limit reached (${maxWatches}). Remove one first.`);
@@ -70,6 +70,7 @@ export class Watcher {
       const watch: WatchRecord = {
         id: randomUUID(),
         agentId,
+        ...context,
         ...ref,
         createdAt: this.now().toISOString(),
         lastPollAt: this.now().toISOString(),

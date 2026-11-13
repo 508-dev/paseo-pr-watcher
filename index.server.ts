@@ -1,7 +1,20 @@
 import type { PluginServerContext } from "@getpaseo/plugin/server";
 import { WatchStore } from "./server/state.js";
 import { Watcher } from "./server/watcher.js";
-import { addWatch, listWatches, removeWatch, resolveUncertain } from "./shared/contracts.js";
+import {
+  addWatch,
+  addWorkspaceWatch,
+  discoverWorkspace,
+  listWatches,
+  removeWatch,
+  resolveUncertain,
+} from "./shared/contracts.js";
+import { discoverPullRequests, readBranch } from "./server/discovery.js";
+import {
+  workspaceDirectory,
+  validateWorkspaceWatch,
+  workspaceWatchAccess,
+} from "./server/workspace.js";
 
 export default function contribute(server: PluginServerContext) {
   const watcher = new Watcher(new WatchStore());
@@ -16,6 +29,29 @@ export default function contribute(server: PluginServerContext) {
     watcher.attachPaseo(paseo);
     const watch = await watcher.add(agentId, pullRequest);
     return { watch };
+  });
+  server.handle(discoverWorkspace, async ({ workspaceId }, { paseo }) => {
+    const cwd = await workspaceDirectory(paseo, workspaceId);
+    const branch = await readBranch(cwd);
+    try {
+      return { ...(await discoverPullRequests(cwd)), error: null };
+    } catch {
+      return {
+        branch,
+        pullRequests: [],
+        error: "Could not detect pull requests. Check gh access, retry, or enter a GitHub PR URL.",
+      };
+    }
+  });
+  server.handle(addWorkspaceWatch, async (input, { paseo }) => {
+    await ready;
+    await validateWorkspaceWatch(input, workspaceWatchAccess(paseo));
+    watcher.attachPaseo(paseo);
+    return {
+      watch: await watcher.add(input.agentId, input.pullRequest, {
+        workspaceId: input.workspaceId,
+      }),
+    };
   });
   server.handle(listWatches, async (_input, { paseo }) => {
     await ready;

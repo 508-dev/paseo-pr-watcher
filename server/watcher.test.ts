@@ -100,6 +100,21 @@ describe("watcher delivery", () => {
     await rm(directory, { recursive: true, force: true });
   });
 
+  it("retains workspace ownership after reload while accepting older agent-only watches", async () => {
+    const watcher = new Watcher(new WatchStore(file), async () => base);
+    await watcher.start();
+    try {
+      await watcher.add("agent-1", "owner/repo#12", { workspaceId: "workspace-a" });
+      await watcher.add("agent-2", "owner/repo#13");
+      const restored = new WatchStore(file);
+      await restored.load();
+      expect(restored.list()[0].workspaceId).toBe("workspace-a");
+      expect(restored.list()[1].workspaceId).toBeUndefined();
+    } finally {
+      watcher.stop();
+    }
+  });
+
   it("baselines existing failures, sends new failures once, and persists the cursor", async () => {
     let snapshot: PullRequestSnapshot = {
       ...base,
