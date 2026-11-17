@@ -1,5 +1,7 @@
 # Paseo PR watcher
 
+Development continues in [508-dev/paseo-plugins](https://github.com/508-dev/paseo-plugins/tree/main/plugins/pr-watcher). This repository remains installable for existing sources. Read the [migration guide](https://github.com/508-dev/paseo-plugins/blob/main/docs/migration.md) before switching an existing installation.
+
 An opt-in [Paseo](https://paseo.sh) plugin that watches a GitHub PR and sends its owning agent a follow-up when checks fail, a review arrives, or the PR develops a merge conflict.
 
 ## Setup
